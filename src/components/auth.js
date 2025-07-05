@@ -1,4 +1,4 @@
-import React, { useContext, useState, useEffect } from 'react';
+import React, { useContext, useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Calendar, Shield, User, Mail } from 'lucide-react';
 import { AppContext } from '../context/appcontext';
@@ -11,10 +11,48 @@ const Auth = () => {
   const [signupData, setSignupData] = useState({ name: '', email: '', password: '' });
   const [loadingGoogle, setLoadingGoogle] = useState(false);
   const navigate = useNavigate();
+  const popupRef = useRef(null);
+
+  useEffect(() => {
+    const messageHandler = async (event) => {
+      console.log('messageHandler triggered', event.data);
+      if (event.origin !== window.location.origin) return;
+      if (event.data.type === 'google-auth-code') {
+        const { code } = event.data;
+        try {
+          const res = await fetch('/api/oauth/google', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ code }),
+          });
+          if (!res.ok) throw new Error('Google login failed');
+          const { token, user } = await res.json();
+
+          localStorage.setItem('jwt', token);
+          setUser(user);
+          console.log('User logged in:', user);
+
+          navigate('/dashboard');
+          console.log('Navigate called');
+
+          setCurrentView('dashboard');
+        } catch (err) {
+          console.error(err);
+          alert('Google login failed');
+        } finally {
+          setLoadingGoogle(false);
+          if (popupRef.current) popupRef.current.close();
+        }
+      }
+    };
+
+    window.addEventListener('message', messageHandler);
+    return () => window.removeEventListener('message', messageHandler);
+  }, [navigate, setUser, setCurrentView]);
 
   const handleGoogleLogin = () => {
     const GOOGLE_CLIENT_ID = process.env.REACT_APP_GOOGLE_CLIENT_ID;
-    const REDIRECT_URI = window.location.origin + '/oauth2callback'; // must match backend & Google console
+    const REDIRECT_URI = 'http://localhost:3000/auth/google/callback';
 
     const authUrl =
       'https://accounts.google.com/o/oauth2/v2/auth?' +
@@ -38,48 +76,30 @@ const Auth = () => {
       `width=${width},height=${height},top=${top},left=${left}`
     );
 
+    popupRef.current = popup;
     setLoadingGoogle(true);
-
-    const messageHandler = async (event) => {
-      if (event.origin !== window.location.origin) return;
-      if (event.data.type === 'google-auth-code') {
-        const { code } = event.data;
-        try {
-          const res = await fetch('/api/oauth/google', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ code }),
-          });
-          if (!res.ok) throw new Error('Google login failed');
-          const { token, user } = await res.json();
-          localStorage.setItem('jwt', token);
-          setUser(user);
-          setCurrentView('dashboard');
-          navigate('/dashboard');
-        } catch (err) {
-          console.error(err);
-          alert('Google login failed');
-        } finally {
-          setLoadingGoogle(false);
-          window.removeEventListener('message', messageHandler);
-          popup.close();
-        }
-      }
-    };
-
-    window.addEventListener('message', messageHandler);
   };
 
   const handleUsernameLogin = () => {
     if (loginData.email && loginData.password) {
-      setUser({ id: 2, name: loginData.email.split('@')[0], email: loginData.email, provider: 'email' });
+      setUser({
+        id: 2,
+        name: loginData.email.split('@')[0],
+        email: loginData.email,
+        provider: 'email',
+      });
       navigate('/dashboard');
     }
   };
 
   const handleSignup = () => {
     if (signupData.name && signupData.email && signupData.password) {
-      setUser({ id: 3, name: signupData.name, email: signupData.email, provider: 'email' });
+      setUser({
+        id: 3,
+        name: signupData.name,
+        email: signupData.email,
+        provider: 'email',
+      });
       navigate('/dashboard');
     }
   };

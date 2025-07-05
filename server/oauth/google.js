@@ -5,27 +5,38 @@ import { query } from '../db.js';
 
 const router = express.Router();
 
-const {
-  GOOGLE_CLIENT_ID,
-  GOOGLE_CLIENT_SECRET,
-  GOOGLE_REDIRECT_URI,
-  JWT_SECRET,
-  JWT_EXPIRES_IN = '7d',
-} = process.env;
-
+// For simplicity, let's move JWT_SECRET access into generateToken for now
 function generateToken(user) {
+  // Make sure process.env.JWT_SECRET is actually available by this point (it will be, as index.js loads it)
   return jwt.sign(
     { id: user.id, name: user.name, email: user.email },
-    JWT_SECRET,
-    { expiresIn: JWT_EXPIRES_IN }
+    process.env.JWT_SECRET, // Access directly
+    { expiresIn: process.env.JWT_EXPIRES_IN || '7d' } // Access directly
   );
 }
 
-router.post('/', async (req, res) => {
+router.post('/google', async (req, res) => {
   const { code } = req.body;
   if (!code) return res.status(400).json({ error: 'Missing authorization code' });
 
   try {
+    // Access variables directly inside the handler,
+    // where you know dotenv.config() in index.js has already run.
+    const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID;
+    const GOOGLE_CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET;
+    const GOOGLE_REDIRECT_URI = process.env.GOOGLE_REDIRECT_URI;
+    const JWT_SECRET_FOR_LOG = process.env.JWT_SECRET; // Just for logging if needed later
+
+    // --- YOUR DEBUG LOGS (KEEP THESE FOR NOW) ---
+    console.log('--- Google OAuth Debug (inside handler) ---');
+    console.log('Code received:', code ? 'Yes' : 'No');
+    console.log('GOOGLE_CLIENT_ID:', GOOGLE_CLIENT_ID);
+    console.log('GOOGLE_CLIENT_SECRET:', GOOGLE_CLIENT_SECRET ? 'Exists' : 'MISSING');
+    console.log('GOOGLE_REDIRECT_URI sent to Google:', GOOGLE_REDIRECT_URI);
+    console.log('JWT_SECRET (inside handler):', JWT_SECRET_FOR_LOG ? 'Exists' : 'MISSING');
+    console.log('--- End Google OAuth Debug (inside handler) ---');
+    // --- END DEBUG LOGS ---
+
     // Exchange code for tokens - send params as URLSearchParams to comply with Google's API
     const tokenResponse = await axios.post(
       'https://oauth2.googleapis.com/token',
@@ -63,7 +74,7 @@ router.post('/', async (req, res) => {
     const result = await query(upsertUserQuery, [googleId, email, name, picture]);
     const user = result.rows[0];
 
-    const token = generateToken(user);
+    const token = generateToken(user); // generateToken will now access process.env.JWT_SECRET directly
 
     res.json({
       token,
@@ -75,7 +86,7 @@ router.post('/', async (req, res) => {
       },
     });
   } catch (err) {
-    console.error('Google OAuth error:', err.response?.data || err.message || err);
+    console.error('Google OAuth error (in handler catch):', err.response?.data || err.message || err);
     res.status(500).json({ error: 'Failed to authenticate with Google' });
   }
 });

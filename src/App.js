@@ -11,6 +11,7 @@ import Confirmation from './components/confirmation';
 import ErrorPage from './components/errorpage';
 import Layout from './components/layout';
 import OAuthCallback from './components/oauthcallback';
+import GoogleAuthHandler from './components/googleauthhandler';
 
 function PrivateRoute({ children }) {
   const { user } = useContext(AppContext);
@@ -24,6 +25,7 @@ function App() {
         <Routes>
           {/* Public route */}
           <Route path="/" element={<Auth />} />
+          <Route path="/auth/google/callback" element={<GoogleAuthHandler />} />
 
           {/* Protected routes */}
           <Route

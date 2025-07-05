@@ -1,7 +1,8 @@
 import express from 'express';
 import bcrypt from 'bcrypt';
-import { query, findUserByEmail, createUser } from './db.js';
-import { generateToken, authenticateToken } from './auth.js';
+import { query, findUserByEmail, createUser } from './db.js'; // Adjust path to db.js if necessary
+// Now, import from your new utility file:
+import { generateToken, authenticateToken } from './authUtils.js'; // Adjust path as per your new file location
 
 const router = express.Router();
 
@@ -76,4 +77,4 @@ router.post('/logout', authenticateToken, (req, res) => {
   res.clearCookie('token').json({ message: 'Logged out' });
 });
 
-export default router;
+export default router; // This correctly exports the router
