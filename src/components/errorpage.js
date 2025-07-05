@@ -13,7 +13,7 @@ const ErrorPage = ({ errorCode = 404, errorMessage = "Page Not Found" }) => {
           {/* Your error image from public/assets */}
           <div className="flex items-center justify-center h-48 bg-gray-200">
             <img
-              src="/assets/arpit.png"  // <== public URL path
+              src="../assets/arpit.png"  // <== public URL path
               alt="Error illustration"
               className="max-h-full max-w-full object-contain"
             />
