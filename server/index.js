@@ -8,8 +8,14 @@ import authRouter from './auth.js';
 
 dotenv.config();
 
+console.log('--- Dotenv Test ---');
+console.log('TEST_VAR from .env:', process.env.TEST_VAR);
+console.log('PORT:', process.env.PORT);
+console.log('GOOGLE_CLIENT_ID (index.js check):', process.env.GOOGLE_CLIENT_ID);
+console.log('--- End Dotenv Test ---');
+
 const app = express();
-const PORT = process.env.PORT || 4000;
+const PORT = process.env.PORT || 5000;
 
 app.use(cors({
   origin: process.env.FRONTEND_URL || 'http://localhost:3000',
