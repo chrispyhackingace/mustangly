@@ -3,52 +3,15 @@ import { useNavigate } from 'react-router-dom';
 import { Calendar, Shield, User, Mail } from 'lucide-react';
 import { AppContext } from '../context/appcontext';
 import Layout from './layout';
+import { supabase } from '../supabase-client';
 
 const Auth = () => {
-  const { setUser, setCurrentView } = useContext(AppContext);
   const [authMode, setAuthMode] = useState('login');
   const [loginData, setLoginData] = useState({ email: '', password: '' });
   const [signupData, setSignupData] = useState({ name: '', email: '', password: '' });
   const [loadingGoogle, setLoadingGoogle] = useState(false);
   const navigate = useNavigate();
   const popupRef = useRef(null);
-
-  useEffect(() => {
-    const messageHandler = async (event) => {
-      console.log('messageHandler triggered', event.data);
-      if (event.origin !== window.location.origin) return;
-      if (event.data.type === 'google-auth-code') {
-        const { code } = event.data;
-        try {
-          const res = await fetch('/api/oauth/google', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ code }),
-          });
-          if (!res.ok) throw new Error('Google login failed');
-          const { token, user } = await res.json();
-
-          localStorage.setItem('jwt', token);
-          setUser(user);
-          console.log('User logged in:', user);
-
-          navigate('/dashboard');
-          console.log('Navigate called');
-
-          setCurrentView('dashboard');
-        } catch (err) {
-          console.error(err);
-          alert('Google login failed');
-        } finally {
-          setLoadingGoogle(false);
-          if (popupRef.current) popupRef.current.close();
-        }
-      }
-    };
-
-    window.addEventListener('message', messageHandler);
-    return () => window.removeEventListener('message', messageHandler);
-  }, [navigate, setUser, setCurrentView]);
 
   const handleGoogleLogin = () => {
     const GOOGLE_CLIENT_ID = process.env.REACT_APP_GOOGLE_CLIENT_ID;
@@ -80,27 +43,23 @@ const Auth = () => {
     setLoadingGoogle(true);
   };
 
-  const handleUsernameLogin = () => {
-    if (loginData.email && loginData.password) {
-      setUser({
-        id: 2,
-        name: loginData.email.split('@')[0],
-        email: loginData.email,
-        provider: 'email',
-      });
-      navigate('/dashboard');
+  const handleUsernameLogin = async (e) => {
+    e.preventDefault();
+    
+    const {error} = await supabase.auth.signInWithPassword({email: loginData.email, password: loginData.password});
+    if (error) {
+      console.error('Signup error:', error.message);
+      return;
     }
   };
 
-  const handleSignup = () => {
-    if (signupData.name && signupData.email && signupData.password) {
-      setUser({
-        id: 3,
-        name: signupData.name,
-        email: signupData.email,
-        provider: 'email',
-      });
-      navigate('/dashboard');
+  const handleSignup = async (e) => {
+    e.preventDefault();
+
+    const {error} = await supabase.auth.signUp({email: signupData.email, password: signupData.password});
+    if (error) {
+      console.error('Signup error:', error.message);
+      return;
     }
   };
 
