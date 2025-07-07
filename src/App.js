@@ -1,4 +1,3 @@
-import React, { useEffect, useContext } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate, Outlet } from 'react-router-dom';
 import { AppProvider, AppContext } from './context/appcontext';
 import Auth from './components/auth';
@@ -11,22 +10,10 @@ import ErrorPage from './components/errorpage';
 import Layout from './components/layout';
 import OAuthCallback from './components/oauthcallback';
 import GoogleAuthHandler from './components/googleauthhandler';
-import { supabase } from './supabase-client';
 import ProtectedRoute from './components/ProtectedRoute';
 import UnauthorizedRoute from './components/UnauthorizedRoute';
 
 function App() {
-  const [session, setSession] = React.useState(null);
-
-  const fetchSession = async () => {
-    const currentSession = await supabase.auth.getSession();
-    console.log(currentSession);
-    setSession(currentSession.data.session);
-  }
-
-  useEffect(() => {
-    fetchSession();
-  }, []);
 
   return (
     <Router>

@@ -13,33 +13,10 @@ const Auth = () => {
   const navigate = useNavigate();
   const popupRef = useRef(null);
 
-  const handleGoogleLogin = () => {
-    const GOOGLE_CLIENT_ID = process.env.REACT_APP_GOOGLE_CLIENT_ID;
-    const REDIRECT_URI = 'http://localhost:3000/auth/google/callback';
-
-    const authUrl =
-      'https://accounts.google.com/o/oauth2/v2/auth?' +
-      new URLSearchParams({
-        client_id: GOOGLE_CLIENT_ID,
-        redirect_uri: REDIRECT_URI,
-        response_type: 'code',
-        scope: 'openid email profile',
-        access_type: 'offline',
-        prompt: 'consent',
-      }).toString();
-
-    const width = 500;
-    const height = 600;
-    const left = window.screenX + (window.outerWidth - width) / 2;
-    const top = window.screenY + (window.outerHeight - height) / 2.5;
-
-    const popup = window.open(
-      authUrl,
-      'Google Login',
-      `width=${width},height=${height},top=${top},left=${left}`
-    );
-
-    popupRef.current = popup;
+  const handleGoogleLogin = async () => {
+    await supabase.auth.signInWithOAuth({
+      provider: "google",
+    });
     setLoadingGoogle(true);
   };
 
@@ -50,6 +27,8 @@ const Auth = () => {
     if (error) {
       console.error('Signup error:', error.message);
       return;
+    } else {
+      navigate('/dashboard');
     }
   };
 
@@ -60,6 +39,8 @@ const Auth = () => {
     if (error) {
       console.error('Signup error:', error.message);
       return;
+    } else {
+      navigate('/dashboard');
     }
   };
 
