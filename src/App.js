@@ -1,6 +1,4 @@
-// src/App.js
-import React, { useContext } from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate, Outlet } from 'react-router-dom';
 import { AppProvider, AppContext } from './context/appcontext';
 import Auth from './components/auth';
 import Dashboard from './components/dashboard';
@@ -12,74 +10,35 @@ import ErrorPage from './components/errorpage';
 import Layout from './components/layout';
 import OAuthCallback from './components/oauthcallback';
 import GoogleAuthHandler from './components/googleauthhandler';
-
-function PrivateRoute({ children }) {
-  const { user } = useContext(AppContext);
-  return user ? children : <Navigate to="/" replace />;
-}
+import ProtectedRoute from './components/ProtectedRoute';
+import UnauthorizedRoute from './components/UnauthorizedRoute';
 
 function App() {
+
   return (
     <Router>
+      <Layout />
       <AppProvider>
         <Routes>
-          {/* Public route */}
-          <Route path="/" element={<Auth />} />
-          <Route path="/auth/google/callback" element={<GoogleAuthHandler />} />
+          {/* Unauthorized route */}
+          <Route element={ <UnauthorizedRoute /> }>
+            <Route path="/" element={ <Navigate to="/login" /> } />
+            <Route path="/login" element={ <Auth /> } />
+          </Route>
 
           {/* Protected routes */}
-          <Route
-            path="/dashboard"
-            element={
-              <PrivateRoute>
-                <Layout>
-                  <Dashboard />
-                </Layout>
-              </PrivateRoute>
-            }
-          />
-          <Route
-            path="/availability"
-            element={
-              <PrivateRoute>
-                <Layout>
-                  <Availability />
-                </Layout>
-              </PrivateRoute>
-            }
-          />
-          <Route
-            path="/bookings"
-            element={
-              <PrivateRoute>
-                <Layout>
-                  <Bookings />
-                </Layout>
-              </PrivateRoute>
-            }
-          />
-          <Route
-            path="/settings"
-            element={
-              <PrivateRoute>
-                <Layout>
-                  <Settings />
-                </Layout>
-              </PrivateRoute>
-            }
-          />
-          <Route
-            path="/confirmation"
-            element={
-              <PrivateRoute>
-                <Layout>
-                  <Confirmation />
-                </Layout>
-              </PrivateRoute>
-            }
-          />
+          <Route element={ <ProtectedRoute /> }>
+            <Route path="/login" element={ <Navigate to="/dashboard" /> } />
+            <Route path="/" element={ <Navigate to="/dashboard" /> } />
+            <Route path="/dashboard" element={ <Dashboard /> } />
+            <Route path="/availability" element={ <Availability /> } />
+            <Route path="/bookings" element={ <Bookings /> } />
+            <Route path="/settings" element={ <Settings /> } />
+            <Route path="/confirmation" element={ <Confirmation /> } />
+          </Route>
 
-          {/* OAuth callback route (public) */}
+          {/* OAuth routes (public) */}
+          <Route path="/auth/google/callback" element={<GoogleAuthHandler />} />
           <Route path="/oauth2callback" element={<OAuthCallback />} />
 
           {/* Catch-all 404 */}

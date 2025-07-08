@@ -3,9 +3,9 @@ import { useNavigate } from 'react-router-dom';
 import { Calendar, Shield, User, Mail } from 'lucide-react';
 import { AppContext } from '../context/appcontext';
 import Layout from './layout';
+import { supabase } from '../supabase-client';
 
 const Auth = () => {
-  const { setUser, setCurrentView } = useContext(AppContext);
   const [authMode, setAuthMode] = useState('login');
   const [loginData, setLoginData] = useState({ email: '', password: '' });
   const [signupData, setSignupData] = useState({ name: '', email: '', password: '' });
@@ -13,93 +13,33 @@ const Auth = () => {
   const navigate = useNavigate();
   const popupRef = useRef(null);
 
-  useEffect(() => {
-    const messageHandler = async (event) => {
-      console.log('messageHandler triggered', event.data);
-      if (event.origin !== window.location.origin) return;
-      if (event.data.type === 'google-auth-code') {
-        const { code } = event.data;
-        try {
-          const res = await fetch('/api/oauth/google', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ code }),
-          });
-          if (!res.ok) throw new Error('Google login failed');
-          const { token, user } = await res.json();
-
-          localStorage.setItem('jwt', token);
-          setUser(user);
-          console.log('User logged in:', user);
-
-          navigate('/dashboard');
-          console.log('Navigate called');
-
-          setCurrentView('dashboard');
-        } catch (err) {
-          console.error(err);
-          alert('Google login failed');
-        } finally {
-          setLoadingGoogle(false);
-          if (popupRef.current) popupRef.current.close();
-        }
-      }
-    };
-
-    window.addEventListener('message', messageHandler);
-    return () => window.removeEventListener('message', messageHandler);
-  }, [navigate, setUser, setCurrentView]);
-
-  const handleGoogleLogin = () => {
-    const GOOGLE_CLIENT_ID = process.env.REACT_APP_GOOGLE_CLIENT_ID;
-    const REDIRECT_URI = 'http://localhost:3000/auth/google/callback';
-
-    const authUrl =
-      'https://accounts.google.com/o/oauth2/v2/auth?' +
-      new URLSearchParams({
-        client_id: GOOGLE_CLIENT_ID,
-        redirect_uri: REDIRECT_URI,
-        response_type: 'code',
-        scope: 'openid email profile',
-        access_type: 'offline',
-        prompt: 'consent',
-      }).toString();
-
-    const width = 500;
-    const height = 600;
-    const left = window.screenX + (window.outerWidth - width) / 2;
-    const top = window.screenY + (window.outerHeight - height) / 2.5;
-
-    const popup = window.open(
-      authUrl,
-      'Google Login',
-      `width=${width},height=${height},top=${top},left=${left}`
-    );
-
-    popupRef.current = popup;
+  const handleGoogleLogin = async () => {
+    await supabase.auth.signInWithOAuth({
+      provider: "google",
+    });
     setLoadingGoogle(true);
   };
 
-  const handleUsernameLogin = () => {
-    if (loginData.email && loginData.password) {
-      setUser({
-        id: 2,
-        name: loginData.email.split('@')[0],
-        email: loginData.email,
-        provider: 'email',
-      });
+  const handleUsernameLogin = async (e) => {
+    e.preventDefault();
+    
+    const {error} = await supabase.auth.signInWithPassword({email: loginData.email, password: loginData.password});
+    if (error) {
+      console.error('Signup error:', error.message);
+      return;
+    } else {
       navigate('/dashboard');
     }
   };
 
-  const handleSignup = () => {
-    if (signupData.name && signupData.email && signupData.password) {
-      setUser({
-        id: 3,
-        name: signupData.name,
-        email: signupData.email,
-        provider: 'email',
-      });
+  const handleSignup = async (e) => {
+    e.preventDefault();
+
+    const {error} = await supabase.auth.signUp({email: signupData.email, password: signupData.password});
+    if (error) {
+      console.error('Signup error:', error.message);
+      return;
+    } else {
       navigate('/dashboard');
     }
   };

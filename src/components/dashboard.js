@@ -1,17 +1,16 @@
-// src/components/Dashboard.js
 import React, { useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Calendar, Clock, User, Mail, Settings, Plus } from 'lucide-react';
 import { AppContext } from '../context/appcontext';
-import Layout from './layout'; // ✅ Import Layout wrapper
+import Logout from './logout';
 
 const Dashboard = () => {
   const { user, bookedSlots, availabilitySlots, timezone } = useContext(AppContext);
   const navigate = useNavigate();
 
   return (
-    <Layout> {/* ✅ Wrap everything inside Layout */}
-      <div className="min-h-[calc(100vh-96px)] bg-gray-50">
+    <div className="min-h-[calc(100vh-96px)] bg-gray-50">
+        <Logout></Logout>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {/* Stats Cards */}
@@ -125,7 +124,7 @@ const Dashboard = () => {
           </div>
         </div>
       </div>
-    </Layout>
+
   );
 };
 
