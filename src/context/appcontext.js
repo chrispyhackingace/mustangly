@@ -1,5 +1,6 @@
 // src/context/AppContext.js
 import React, { createContext, useState, useEffect } from 'react';
+import { supabase } from '../supabase-client';
 
 export const AppContext = createContext();
 
@@ -20,25 +21,35 @@ export const AppProvider = ({ children }) => {
     allowCancellation: true
   });
 
-  // Initialize data from localStorage
+  // Initialize data from localStorage and Supabase
   useEffect(() => {
-    const savedUser = localStorage.getItem('user');
-    const savedSlots = localStorage.getItem('availabilitySlots');
-    const savedBookings = localStorage.getItem('bookedSlots');
-    const savedPassword = localStorage.getItem('hostPassword');
-    const savedSettings = localStorage.getItem('hostSettings');
+    const initializeData = async () => {
+      const savedUser = localStorage.getItem('user');
+      const savedPassword = localStorage.getItem('hostPassword');
+      const savedSettings = localStorage.getItem('hostSettings');
 
-    if (savedUser) setUser(JSON.parse(savedUser));
-    if (savedSlots) setAvailabilitySlots(JSON.parse(savedSlots));
-    else setAvailabilitySlots(initializeDefaultSlots());
-    if (savedBookings) setBookedSlots(JSON.parse(savedBookings));
-    if (savedPassword) setHostPassword(savedPassword);
-    else {
-      const defaultPassword = generateRandomPassword();
-      setHostPassword(defaultPassword);
-      localStorage.setItem('hostPassword', defaultPassword);
-    }
-    if (savedSettings) setHostSettings(JSON.parse(savedSettings));
+      if (savedUser) setUser(JSON.parse(savedUser));
+      if (savedPassword) setHostPassword(savedPassword);
+      else {
+        const defaultPassword = generateRandomPassword();
+        setHostPassword(defaultPassword);
+        localStorage.setItem('hostPassword', defaultPassword);
+      }
+      if (savedSettings) setHostSettings(JSON.parse(savedSettings));
+
+      // Load availability from Supabase if user is logged in
+      const { data: { user: currentUser } } = await supabase.auth.getUser();
+      if (currentUser) {
+        await loadAvailabilityFromSupabase(currentUser.id);
+      } else {
+        // Fallback to localStorage or default slots
+        const savedSlots = localStorage.getItem('availabilitySlots');
+        if (savedSlots) setAvailabilitySlots(JSON.parse(savedSlots));
+        else setAvailabilitySlots(initializeDefaultSlots());
+      }
+    };
+
+    initializeData();
   }, []);
 
   const initializeDefaultSlots = () => {
@@ -48,11 +59,93 @@ export const AppProvider = ({ children }) => {
       { id: 3, day: 'Wednesday', startTime: '09:00', endTime: '17:00', active: true },
       { id: 4, day: 'Thursday', startTime: '09:00', endTime: '17:00', active: true },
       { id: 5, day: 'Friday', startTime: '09:00', endTime: '17:00', active: true },
+      { id: 6, day: 'Saturday', startTime: '10:00', endTime: '16:00', active: false },
+      { id: 7, day: 'Sunday', startTime: '10:00', endTime: '16:00', active: false },
     ];
   };
 
   const generateRandomPassword = () => {
     return Math.random().toString(36).slice(2, 10); // 8-character password
+  };
+
+  // Supabase functions for availability
+  const loadAvailabilityFromSupabase = async (userId) => {
+    try {
+      const { data, error } = await supabase
+        .from('availability_slots')
+        .select('*')
+        .eq('user_id', userId)
+        .order('id');
+
+      if (error) {
+        console.error('Error loading availability:', error);
+        // Fallback to default slots
+        setAvailabilitySlots(initializeDefaultSlots());
+        return;
+      }
+
+      if (data && data.length > 0) {
+        setAvailabilitySlots(data);
+      } else {
+        // No data in database, create default slots
+        const defaultSlots = initializeDefaultSlots();
+        setAvailabilitySlots(defaultSlots);
+        await saveAvailabilityToSupabase(userId, defaultSlots);
+      }
+    } catch (err) {
+      console.error('Error loading availability:', err);
+      setAvailabilitySlots(initializeDefaultSlots());
+    }
+  };
+
+  const saveAvailabilityToSupabase = async (userId, slots) => {
+    try {
+      // First, delete existing slots for this user
+      await supabase
+        .from('availability_slots')
+        .delete()
+        .eq('user_id', userId);
+
+      // Then insert new slots
+      const slotsWithUserId = slots.map(slot => ({
+        ...slot,
+        user_id: userId
+      }));
+
+      const { error } = await supabase
+        .from('availability_slots')
+        .insert(slotsWithUserId);
+
+      if (error) {
+        throw error;
+      }
+
+      return true;
+    } catch (err) {
+      console.error('Error saving availability:', err);
+      throw err;
+    }
+  };
+
+  const saveAvailability = async (slots) => {
+    try {
+      const { data: { user: currentUser } } = await supabase.auth.getUser();
+      
+      if (currentUser) {
+        await saveAvailabilityToSupabase(currentUser.id, slots);
+        setAvailabilitySlots(slots);
+        addNotification('Availability saved successfully', 'success');
+      } else {
+        // Fallback to localStorage if not logged in
+        setAvailabilitySlots(slots);
+        localStorage.setItem('availabilitySlots', JSON.stringify(slots));
+        addNotification('Availability saved locally', 'success');
+      }
+    } catch (err) {
+      console.error('Error saving availability:', err);
+      addNotification('Failed to save availability', 'error');
+      throw err;
+    }
   };
 
   // Persist data to localStorage
@@ -157,7 +250,8 @@ export const AppProvider = ({ children }) => {
       addNotification,
       verifyHost,
       updateHostPassword,
-      updateHostSettings
+      updateHostSettings,
+      saveAvailability
     }}>
       {children}
     </AppContext.Provider>

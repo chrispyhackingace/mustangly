@@ -61,105 +61,98 @@ const Availability = () => {
   return (
     <Layout>
       <div className="bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50 min-h-[calc(100vh-96px)] relative">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
+          {/* Weekly Availability Section */}
           <div className="bg-gradient-to-r from-cyan-100 via-blue-100 to-purple-100 rounded-2xl shadow-xl border-2 border-purple-200 p-8">
-            <div className="flex items-center justify-between mb-8">
-              <h3 className="text-4xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">Weekly Availability</h3>
-              <div className="bg-white px-4 py-2 rounded-full shadow-md">
+            <div className="text-center mb-8">
+              <h3 className="text-4xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent mb-4">Weekly Availability</h3>
+              <div className="inline-block bg-white px-6 py-2 rounded-full shadow-md">
                 <span className="text-sm font-semibold text-gray-600">Edit Your Schedule</span>
               </div>
             </div>
 
-            <div className="space-y-6">
+            {/* Days Grid - Horizontal Layout */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-8">
               {localSlots.map(slot => (
-                <div key={slot.id} className="flex items-center justify-between p-6 border-2 border-blue-200 rounded-2xl bg-gradient-to-r from-blue-50 to-purple-50 hover:from-blue-100 hover:to-purple-100 transition-all duration-300 transform hover:scale-102 hover:shadow-lg">
-                  <div className="flex items-center space-x-6">
-                    <div className="w-28 font-bold text-lg text-purple-700 bg-white px-3 py-1 rounded-lg shadow-sm">{slot.day}</div>
-                    <div className="flex items-center space-x-4">
-                      <div className="relative">
-                        <input
-                          type="time"
-                          value={slot.startTime}
-                          disabled={saving}
-                          onChange={e => handleSlotChange(slot.id, { startTime: e.target.value })}
-                          className="border-2 border-purple-300 rounded-lg px-4 py-3 text-sm font-semibold focus:outline-none focus:ring-4 focus:ring-purple-200 focus:border-purple-500 bg-white shadow-sm"
-                        />
-                        <Clock className="absolute top-3 right-3 text-purple-400 w-4 h-4" />
-                      </div>
-                      <span className="text-purple-600 font-bold text-lg">to</span>
-                      <div className="relative">
-                        <input
-                          type="time"
-                          value={slot.endTime}
-                          disabled={saving}
-                          onChange={e => handleSlotChange(slot.id, { endTime: e.target.value })}
-                          className="border-2 border-purple-300 rounded-lg px-4 py-3 text-sm font-semibold focus:outline-none focus:ring-4 focus:ring-purple-200 focus:border-purple-500 bg-white shadow-sm"
-                        />
-                        <Clock className="absolute top-3 right-3 text-purple-400 w-4 h-4" />
-                      </div>
+                <div key={slot.id} className="bg-white rounded-2xl border-2 border-blue-200 p-6 hover:border-purple-400 transition-all duration-300 transform hover:scale-105 hover:shadow-lg">
+                  <div className="text-center mb-4">
+                    <div className="font-bold text-lg text-purple-700 bg-gradient-to-r from-blue-50 to-purple-50 px-4 py-2 rounded-lg shadow-sm">
+                      {slot.day}
                     </div>
                   </div>
-
-                  <div className="flex items-center space-x-3">
-                    <button
-                      disabled={saving}
-                      onClick={() => handleSlotChange(slot.id, { active: !slot.active })}
-                      className={`p-3 rounded-full transition-all duration-300 transform hover:scale-110 shadow-lg ${slot.active ? 'bg-gradient-to-r from-green-400 to-green-600 text-white hover:from-green-500 hover:to-green-700' : 'bg-gradient-to-r from-red-400 to-red-600 text-white hover:from-red-500 hover:to-red-700'}`}
-                      aria-label={slot.active ? 'Deactivate slot' : 'Activate slot'}
-                    >
-                      {slot.active ? <Check className="w-6 h-6" /> : <X className="w-6 h-6" />}
-                    </button>
+                  
+                  <div className="space-y-4">
+                    <div className="relative">
+                      <label className="block text-sm font-medium text-gray-600 mb-1">Start Time</label>
+                      <input
+                        type="time"
+                        value={slot.startTime}
+                        disabled={saving}
+                        onChange={e => handleSlotChange(slot.id, { startTime: e.target.value })}
+                        className="w-full border-2 border-purple-300 rounded-lg px-3 py-2 text-sm font-semibold focus:outline-none focus:ring-4 focus:ring-purple-200 focus:border-purple-500 bg-white shadow-sm"
+                      />
+                      <Clock className="absolute top-7 right-3 text-purple-400 w-4 h-4" />
+                    </div>
+                    
+                    <div className="relative">
+                      <label className="block text-sm font-medium text-gray-600 mb-1">End Time</label>
+                      <input
+                        type="time"
+                        value={slot.endTime}
+                        disabled={saving}
+                        onChange={e => handleSlotChange(slot.id, { endTime: e.target.value })}
+                        className="w-full border-2 border-purple-300 rounded-lg px-3 py-2 text-sm font-semibold focus:outline-none focus:ring-4 focus:ring-purple-200 focus:border-purple-500 bg-white shadow-sm"
+                      />
+                      <Clock className="absolute top-7 right-3 text-purple-400 w-4 h-4" />
+                    </div>
+                    
+                    <div className="text-center pt-2">
+                      <button
+                        disabled={saving}
+                        onClick={() => handleSlotChange(slot.id, { active: !slot.active })}
+                        className={`px-4 py-2 rounded-full transition-all duration-300 transform hover:scale-110 shadow-lg font-medium text-sm ${slot.active ? 'bg-gradient-to-r from-green-400 to-green-600 text-white hover:from-green-500 hover:to-green-700' : 'bg-gradient-to-r from-red-400 to-red-600 text-white hover:from-red-500 hover:to-red-700'}`}
+                        aria-label={slot.active ? 'Deactivate slot' : 'Activate slot'}
+                      >
+                        {slot.active ? (
+                          <>
+                            <Check className="w-4 h-4 inline mr-1" />
+                            Active
+                          </>
+                        ) : (
+                          <>
+                            <X className="w-4 h-4 inline mr-1" />
+                            Inactive
+                          </>
+                        )}
+                      </button>
+                    </div>
                   </div>
                 </div>
               ))}
             </div>
-          </div>
 
-          <div className="bg-gradient-to-r from-pink-100 via-purple-100 to-indigo-100 rounded-2xl shadow-xl border-2 border-pink-200 p-8 text-center">
-            <h3 className="text-4xl font-bold bg-gradient-to-r from-pink-600 to-purple-600 bg-clip-text text-transparent mb-6">Select Date & Time</h3>
-            <div className="bg-white rounded-xl p-6 shadow-lg">
-              <DatePicker
-                selected={selectedDate}
-                onChange={date => setSelectedDate(date)}
-                showTimeSelect
-                timeIntervals={15}
-                dateFormat="MMMM d, yyyy h:mm aa"
-                className="border-2 border-purple-300 rounded-lg p-4 w-full max-w-sm mx-auto shadow-md focus:ring-4 focus:ring-purple-200 focus:border-purple-500 font-semibold"
-                placeholderText="Select date and time"
-                popperPlacement="bottom"
-              />
-            </div>
-
-            <div className="mt-8 max-w-sm mx-auto">
-              <label htmlFor="timezone-select" className="block mb-3 font-bold text-lg text-purple-700">
-                Select Timezone
-              </label>
-              <select
-                id="timezone-select"
-                value={timezone}
-                onChange={e => setTimezone(e.target.value)}
-                className="border-2 border-purple-300 rounded-lg px-4 py-3 w-full shadow-lg focus:ring-4 focus:ring-purple-200 focus:border-purple-500 font-semibold bg-white"
-              >
-                {timeZones.map(tz => (
-                  <option key={tz} value={tz}>{tz}</option>
-                ))}
-              </select>
-            </div>
-
-            <div className="mt-10">
+            {/* Save Button */}
+            <div className="text-center">
               <button
                 onClick={handleSave}
                 disabled={saving}
                 className={`px-8 py-4 rounded-2xl text-white font-bold text-lg shadow-xl transition-all duration-300 transform hover:scale-105 ${saving ? 'bg-gray-400 cursor-not-allowed' : 'bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-500 hover:from-pink-600 hover:via-purple-600 hover:to-indigo-600 hover:shadow-2xl'}`}
                 title="Save your availability changes"
               >
-                {saving ? 'Saving...' : '💾 Save Availability'}
+                {saving ? (
+                  <span className="flex items-center justify-center">
+                    <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin mr-2"></div>
+                    Saving...
+                  </span>
+                ) : (
+                  '💾 Save Availability'
+                )}
               </button>
             </div>
           </div>
 
           <div className="bg-gradient-to-r from-green-100 via-emerald-100 to-teal-100 rounded-2xl shadow-xl border-2 border-green-200 p-8">
-            <h3 className="text-4xl font-bold bg-gradient-to-r from-green-600 to-teal-600 bg-clip-text text-transparent mb-6">✨ Your Active Availability</h3>
+            <h3 className="text-4xl font-bold bg-gradient-to-r from-green-600 to-teal-600 bg-clip-text text-transparent mb-6">Current Availability</h3>
             {localSlots.filter(slot => slot.active && slot.startTime && slot.endTime).length > 0 ? (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {localSlots.filter(slot => slot.active && slot.startTime && slot.endTime).map(slot => (
@@ -174,7 +167,7 @@ const Availability = () => {
                     </div>
                     <div className="mt-4 text-center">
                       <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-800">
-                        ✅ Available
+                        Available
                       </span>
                     </div>
                   </div>

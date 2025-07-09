@@ -10,12 +10,35 @@ body {
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI',
     Roboto, Oxygen, Ubuntu, Cantarell, 'Fira Sans', 'Droid Sans',
     'Helvetica Neue', sans-serif;
-  background: #f0f2f5;
-  color: #333;
+  background: #f5f5dc; /* Beige background */
+  color: #2e7d32; /* Green text */
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   min-height: 100vh;
-  line-height: 1.5;
+  line-height: 1.6; /* Slightly increased line height for readability */
+  font-size: 1.125rem; /* Larger base font size */
+}
+
+/* Headers */
+h1 {
+  font-size: 2.5rem;
+  font-weight: bold;
+  color: #1b5e20; /* Darker green for headers */
+  margin-bottom: 1rem;
+}
+
+h2 {
+  font-size: 2rem;
+  font-weight: bold;
+  color: #1b5e20;
+  margin-bottom: 0.75rem;
+}
+
+h3 {
+  font-size: 1.75rem;
+  font-weight: bold;
+  color: #1b5e20;
+  margin-bottom: 0.5rem;
 }
 
 /* Inputs & buttons */
@@ -25,26 +48,34 @@ button {
 }
 
 input {
-  border: 1px solid #ccc;
+  border: 1px solid #8bc34a; /* Light green border */
   border-radius: 0.5rem;
-  padding: 0.6rem 1rem;
-  font-size: 1rem;
+  padding: 0.8rem 1.2rem; /* Larger padding */
+  font-size: 1.125rem; /* Match base font size */
   transition: border-color 0.2s ease-in-out;
 }
 
 input:focus {
   outline: none;
-  border-color: #6366f1; /* Indigo-500 */
-  box-shadow: 0 0 5px rgba(99, 102, 241, 0.5);
+  border-color: #558b2f; /* Darker green on focus */
+  box-shadow: 0 0 5px rgba(85, 139, 47, 0.5);
 }
 
 button {
   cursor: pointer;
   border: none;
   border-radius: 0.75rem;
-  padding: 0.75rem 1.5rem;
+  padding: 0.75rem 1.5rem; /* Reduced padding */
   font-weight: 600;
+  font-size: 1rem; /* Slightly smaller font size */
+  background-color: #8bc34a; /* Light green */
+  color: #fff; /* White text */
   transition: background-color 0.3s ease;
+  margin-bottom: 1rem; /* Add space below each button */
+}
+
+button:hover {
+  background-color: #558b2f; /* Darker green on hover */
 }
 
 button:disabled {
@@ -52,7 +83,67 @@ button:disabled {
   opacity: 0.6;
 }
 
+/* Style for smaller Google button */
+.google-button {
+  width: 12.5%; /* 1/8 size */
+  height: auto;
+  padding: 0.5rem; /* Smaller padding */
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #fff; /* White background */
+  border: 1px solid #ccc; /* Light border */
+  border-radius: 0.5rem;
+  transition: transform 0.2s ease;
+  margin-left: 0.5rem; /* Add space between Google button and adjacent buttons */
+}
+
+.google-button:hover {
+  transform: scale(1.1); /* Slight zoom on hover */
+}
+
+/* Add spacing between buttons and forms */
+form {
+  margin-bottom: 2rem; /* Add space below forms */
+}
+
 /* Utility */
 .text-center {
   text-align: center;
 }
+
+/* Center the auth form in the middle of the screen */
+.auth-center-container {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem 0;
+  position: relative;
+}
+
+/* Main heading styles */
+.main-heading {
+  position: relative;
+  font-size: 6rem; /* Large heading size */
+  font-weight: bold;
+  background: linear-gradient(to right, #3aac32, #0f652f, #447f3b);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+  margin-bottom: 0.3rem;
+  line-height: 1.5;
+}
+
+.main-subheading {
+  font-size: 2rem;
+  color: #4b5563;
+  margin-bottom: 2rem;
+  font-weight: 500;
+}
+
+.spacing-y {
+  margin-bottom: 4rem; /* or whatever spacing you want */
+}
+
