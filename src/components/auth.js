@@ -205,7 +205,7 @@ const Auth = () => {
 
   return (
     <Layout>
-      <div className="auth-center-container bg-gradient-to-br from-violet-900 via-purple-900 to-indigo-900 relative overflow-hidden">
+      <div className="center-container bg-gradient-to-br from-violet-900 via-purple-900 to-indigo-900 relative overflow-hidden">
         {/* Animated background elements */}
         <div className="absolute inset-0 overflow-hidden">
           <div className="absolute -top-40 -right-40 w-80 h-80 bg-gradient-to-br from-pink-400 to-purple-600 rounded-full opacity-20 animate-pulse"></div>

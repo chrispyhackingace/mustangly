@@ -2,47 +2,40 @@ import React, { useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Calendar, Clock, User, Mail, Settings, Plus } from 'lucide-react';
 import { AppContext } from '../context/appcontext';
-import Logout from './logout';
+import Layout from './layout';
 
 const Dashboard = () => {
   const { user, bookedSlots, availabilitySlots, timezone } = useContext(AppContext);
   const navigate = useNavigate();
 
   return (
-    <div className="min-h-[calc(100vh-96px)] bg-gray-50">
-        <Logout></Logout>
+    <Layout>
+    <div className="center-container min-h-[calc(100vh-96px)] bg-gray-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {/* Stats Cards */}
-            <div className="bg-white rounded-xl shadow-sm border p-6 hover:shadow-md transition-shadow">
+            <div className="bg-white rounded-xl shadow-sm border p-6 hover:shadow-md transition-shadow" onClick={() => navigate('/bookings')} style={{ cursor: 'pointer' }}>
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-gray-600">Total Bookings</p>
-                  <p className="text-2xl font-bold text-gray-800">{bookedSlots.length}</p>
+                  <p className="text-sm text-gray-600">Total Bookings: <span className="text-2xl font-bold text-gray-800">{bookedSlots.length}</span></p>
                 </div>
                 <Calendar className="w-12 h-12 text-purple-500" />
               </div>
             </div>
 
-            <div className="bg-white rounded-xl shadow-sm border p-6 hover:shadow-md transition-shadow">
+            <div className="bg-white rounded-xl shadow-sm border p-6 hover:shadow-md transition-shadow" onClick={() => navigate('/availability')} style={{ cursor: 'pointer' }}>
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-gray-600">Available Days</p>
-                  <p className="text-2xl font-bold text-gray-800">
-                    {availabilitySlots.filter(s => s.active).length}/5
-                  </p>
+                  <p className="text-sm text-gray-600">Available Days: <span className="text-2xl font-bold text-gray-800">{availabilitySlots.filter(s => s.active).length}/5</span></p>
                 </div>
                 <Clock className="w-12 h-12 text-green-500" />
               </div>
             </div>
 
-            <div className="bg-white rounded-xl shadow-sm border p-6 hover:shadow-md transition-shadow">
+            <div className="bg-white rounded-xl shadow-sm border p-6 hover:shadow-md transition-shadow" onClick={() => navigate('/settings')} style={{ cursor: 'pointer' }}>
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-gray-600">Current Timezone</p>
-                  <p className="text-xl font-bold text-gray-800">
-                    {timezone.split('/')[1] || timezone}
-                  </p>
+                  <p className="text-sm text-gray-600">Current Timezone: <span className="text-xl font-bold text-gray-800">{timezone.split('/')[1] || timezone}</span></p>
                 </div>
                 <Settings className="w-12 h-12 text-blue-500" />
               </div>
@@ -57,27 +50,27 @@ const Dashboard = () => {
                   className="flex flex-col items-center justify-center p-4 border rounded-lg hover:bg-purple-50 hover:border-purple-200 transition-colors"
                 >
                   <Plus className="w-6 h-6 text-purple-600 mb-2" />
-                  <span>Add Availability</span>
+                  <span>  Add Availability</span>
                 </button>
                 <button 
                   onClick={() => navigate('/bookings')}
                   className="flex flex-col items-center justify-center p-4 border rounded-lg hover:bg-blue-50 hover:border-blue-200 transition-colors"
                 >
                   <Calendar className="w-6 h-6 text-blue-600 mb-2" />
-                  <span>View Bookings</span>
+                  <span>  View Bookings</span>
                 </button>
                 <button 
                   onClick={() => navigate('/settings')}
                   className="flex flex-col items-center justify-center p-4 border rounded-lg hover:bg-green-50 hover:border-green-200 transition-colors"
                 >
                   <Settings className="w-6 h-6 text-green-600 mb-2" />
-                  <span>Settings</span>
+                  <span>  Settings</span>
                 </button>
                 <button 
                   className="flex flex-col items-center justify-center p-4 border rounded-lg hover:bg-orange-50 hover:border-orange-200 transition-colors"
                 >
                   <User className="w-6 h-6 text-orange-600 mb-2" />
-                  <span>My Profile</span>
+                  <span>  My Profile</span>
                 </button>
               </div>
             </div>
@@ -124,7 +117,7 @@ const Dashboard = () => {
           </div>
         </div>
       </div>
-
+    </Layout>
   );
 };
 

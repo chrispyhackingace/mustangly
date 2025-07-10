@@ -17,7 +17,6 @@ function App() {
 
   return (
     <Router>
-      <Layout />
       <AppProvider>
         <Routes>
           {/* Unauthorized route */}

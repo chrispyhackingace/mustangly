@@ -37,10 +37,11 @@ export const AppProvider = ({ children }) => {
       }
       if (savedSettings) setHostSettings(JSON.parse(savedSettings));
 
-      // Load availability from Supabase if user is logged in
+      // Load availability and bookings from Supabase if user is logged in
       const { data: { user: currentUser } } = await supabase.auth.getUser();
       if (currentUser) {
         await loadAvailabilityFromSupabase(currentUser.id);
+        await loadBookingsFromSupabase();
       } else {
         // Fallback to localStorage or default slots
         const savedSlots = localStorage.getItem('availabilitySlots');
@@ -145,6 +146,51 @@ export const AppProvider = ({ children }) => {
       console.error('Error saving availability:', err);
       addNotification('Failed to save availability', 'error');
       throw err;
+    }
+  };
+
+  // Supabase functions for bookings
+  const loadBookingsFromSupabase = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('bookings')
+        .select('*')
+        .order('id');
+
+      if (error) {
+        console.error('Error loading bookings:', error);
+        addNotification('Failed to load bookings', 'error');
+        return;
+      }
+
+      if (data) {
+        setBookedSlots(data);
+      }
+    } catch (err) {
+      console.error('Error loading bookings:', err);
+      addNotification('Failed to load bookings', 'error');
+    }
+  };
+
+  const saveBookingToSupabase = async (booking) => {
+    try {
+      const { data, error } = await supabase
+        .from('bookings')
+        .insert(booking);
+
+      if (error) {
+        console.error('Error saving booking:', error);
+        addNotification('Failed to save booking', 'error');
+        return;
+      }
+
+      if (data) {
+        setBookedSlots((prev) => [...prev, ...data]);
+        addNotification('Booking saved successfully', 'success');
+      }
+    } catch (err) {
+      console.error('Error saving booking:', err);
+      addNotification('Failed to save booking', 'error');
     }
   };
 

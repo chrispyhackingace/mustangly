@@ -1,7 +1,8 @@
 // src/components/Bookings.js
-import React, { useContext, useState } from 'react';
+import React, { useContext, useState, useEffect } from 'react';
 import { User, Calendar as CalendarIcon, Clock, Mail, Trash2, Shield, X } from 'lucide-react';
 import { AppContext } from '../context/appcontext';
+import { supabase } from '../context/appcontext'; // Ensure Supabase client is imported
 import Layout from './layout'; // ✅ Import Layout
 
 const Bookings = () => {
@@ -19,6 +20,30 @@ const Bookings = () => {
     booking: null,
     credentials: { name: '', password: '' }
   });
+  const [availableSlots, setAvailableSlots] = useState([]);
+
+  useEffect(() => {
+    const fetchBookings = async () => {
+      const { data, error } = await supabase.from('bookings').select('*');
+      if (error) {
+        addNotification('Failed to fetch bookings', 'error');
+      } else {
+        setBookedSlots(data);
+      }
+    };
+
+    const fetchAvailableSlots = async () => {
+      const { data, error } = await supabase.from('availability').select('*');
+      if (error) {
+        addNotification('Failed to fetch available slots', 'error');
+      } else {
+        setAvailableSlots(data);
+      }
+    };
+
+    fetchBookings();
+    fetchAvailableSlots();
+  }, [setBookedSlots, addNotification]);
 
   const handleDeleteInit = (booking) => {
     setDeleteModal({
@@ -54,13 +79,69 @@ const Bookings = () => {
     }));
   };
 
+  const handleBooking = async (slot) => {
+    const { data, error } = await supabase.from('bookings').insert({
+      user_id: user.id,
+      slot_id: slot.id,
+      clientName: user.name,
+      clientEmail: user.email,
+      date: slot.date,
+      time: slot.time,
+      duration: slot.duration
+    });
+
+    if (error) {
+      addNotification('Failed to create booking', 'error');
+    } else {
+      addNotification('Booking created successfully', 'success');
+      setBookedSlots((prev) => [...prev, data[0]]);
+    }
+  };
+
   return (
     <Layout>
-      <div className="bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50 min-h-[calc(100vh-96px)] relative">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
+      <div className="flex flex-col items-center justify-center bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50 min-h-[calc(100vh-96px)] relative">
+        <div className="max-w-6xl w-full px-4 sm:px-6 lg:px-8 py-8 space-y-8">
+          {/* Available Slots Section */}
+          <div className="bg-gradient-to-r from-green-100 via-yellow-100 to-orange-100 rounded-2xl shadow-xl border-2 border-orange-200 p-8 text-center">
+            <h3 className="text-4xl font-bold bg-gradient-to-r from-orange-600 to-yellow-600 bg-clip-text text-transparent mb-4">
+              Available Slots
+            </h3>
+            <div className="space-y-6">
+              {availableSlots.map((slot) => (
+                <div key={slot.id} className="bg-white rounded-2xl border-2 border-yellow-200 p-6 hover:border-orange-400 transition-all duration-300 transform hover:scale-102 hover:shadow-lg">
+                  <div className="flex flex-col items-center space-y-4">
+                    <div className="text-center">
+                      <p className="font-bold text-lg text-orange-700 flex items-center justify-center mb-1">
+                        {slot.date} - {slot.time}
+                      </p>
+                      <p className="text-gray-600">Duration: {slot.duration} min</p>
+                    </div>
+                    <button
+                      onClick={() => handleBooking(slot)}
+                      className="p-3 text-green-500 hover:text-green-700 hover:bg-green-50 rounded-full transition-all duration-300 transform hover:scale-110 shadow-lg"
+                      title="Book this slot"
+                    >
+                      Book Now
+                    </button>
+                  </div>
+                </div>
+              ))}
+
+              {availableSlots.length === 0 && (
+                <div className="text-center py-12">
+                  <div className="bg-white rounded-2xl p-8 shadow-lg">
+                    <h4 className="text-2xl font-bold text-orange-700 mb-2">No available slots</h4>
+                    <p className="text-gray-600 text-lg">Check back later for new availability</p>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+
           {/* Scheduled Meetings Section */}
-          <div className="bg-gradient-to-r from-cyan-100 via-blue-100 to-purple-100 rounded-2xl shadow-xl border-2 border-purple-200 p-8">
-            <div className="text-center mb-8">
+          <div className="bg-gradient-to-r from-cyan-100 via-blue-100 to-purple-100 rounded-2xl shadow-xl border-2 border-purple-200 p-8 text-center">
+            <div className="mb-8">
               <h3 className="text-4xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent mb-4">
                 Scheduled Meetings
               </h3>
@@ -76,31 +157,27 @@ const Bookings = () => {
             <div className="space-y-6">
               {bookedSlots.map((booking) => (
                 <div key={booking.id} className="bg-white rounded-2xl border-2 border-blue-200 p-6 hover:border-purple-400 transition-all duration-300 transform hover:scale-102 hover:shadow-lg">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center space-x-6">
-                      <div className="w-16 h-16 bg-gradient-to-r from-purple-400 to-blue-400 rounded-full flex items-center justify-center shadow-lg">
-                        <User className="w-8 h-8 text-white" />
-                      </div>
-                      <div>
-                        <p className="font-bold text-xl text-purple-700">{booking.clientName}</p>
-                        <p className="text-gray-600 flex items-center mt-1">
-                          <Mail className="w-4 h-4 mr-2" />
-                          {booking.clientEmail}
-                        </p>
-                      </div>
+                  <div className="flex flex-col items-center space-y-4">
+                    <div className="w-16 h-16 bg-gradient-to-r from-purple-400 to-blue-400 rounded-full flex items-center justify-center shadow-lg">
+                      <User className="w-8 h-8 text-white" />
                     </div>
-                    
-                    <div className="text-right">
-                      <p className="font-bold text-lg text-purple-700 flex items-center justify-end mb-1">
+                    <div className="text-center">
+                      <p className="font-bold text-xl text-purple-700">{booking.clientName}</p>
+                      <p className="text-gray-600 flex items-center justify-center mt-1">
+                        <Mail className="w-4 h-4 mr-2" />
+                        {booking.clientEmail}
+                      </p>
+                    </div>
+                    <div className="text-center">
+                      <p className="font-bold text-lg text-purple-700 flex items-center justify-center mb-1">
                         <CalendarIcon className="w-5 h-5 mr-2" />
                         {booking.date}
                       </p>
-                      <p className="text-gray-600 flex items-center justify-end">
+                      <p className="text-gray-600 flex items-center justify-center">
                         <Clock className="w-4 h-4 mr-2" />
                         {booking.time} ({booking.duration} min)
                       </p>
                     </div>
-                    
                     {hostSettings.allowCancellation && (
                       <button
                         onClick={() => handleDeleteInit(booking)}

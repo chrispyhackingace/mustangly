@@ -35,10 +35,10 @@ const Settings = () => {
   const [tempSettings, setTempSettings] = useState(hostSettings);
 
   const timeZones = [
-    'America/New_York',
+    'America/New York',
     'America/Chicago',
     'America/Denver',
-    'America/Los_Angeles',
+    'America/Los Angeles',
     'Europe/London',
     'Europe/Paris',
     'Asia/Tokyo',
@@ -91,7 +91,7 @@ const Settings = () => {
 
   return (
     <Layout>
-      <div className="min-h-screen bg-gray-50">
+      <div className="center-container min-h-screen bg-gray-50">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {/* Profile Settings */}
