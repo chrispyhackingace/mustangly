@@ -9,28 +9,29 @@ const ErrorPage = ({ errorCode = 404, errorMessage = "Page Not Found" }) => {
 
   return (
     <Layout>
-      <div className="min-h-[calc(100vh-96px)] bg-gray-50 flex flex-col items-center justify-center p-6">
-        <div className="max-w-2xl w-full bg-white rounded-xl shadow-lg overflow-visible">
-          <div className="p-8 text-center">
-            <h1 className="text-5xl font-bold text-red-600 mb-2">{errorCode}</h1>
-            <h2 className="text-2xl font-semibold text-gray-800 mb-4">{errorMessage}</h2>
-            <p className="text-gray-600 mb-12">
+      <div style={{ minHeight: 'calc(100vh - 96px)', backgroundColor: '#f3f4f6', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '24px' }}>
+        <div style={{ maxWidth: '640px', width: '100%', backgroundColor: '#ffffff', borderRadius: '16px', boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)', overflow: 'visible' }}>
+          <div style={{ padding: '32px', textAlign: 'center' }}>
+            <h1 style={{ fontSize: '40px', fontWeight: 'bold', color: '#1f2937', marginBottom: '8px' }}>{errorCode}</h1>
+            <h2 style={{ fontSize: '24px', fontWeight: '600', color: '#374151', marginBottom: '16px' }}>{errorMessage}</h2>
+            <p style={{ color: '#6b7280', marginBottom: '48px' }}>
               Oops! Something went wrong. The page you're looking for doesn't exist or an error occurred.
             </p>
-            <div className="flex justify-center mb-20">
+            <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '80px' }}>
               <img
                 src={arpitImg}
                 alt="Error illustration"
-                className="w-[24rem] h-[24rem] object-contain mx-auto"
-                style={{ transform: 'scale(1.2)' }}
+                style={{ width: '384px', height: '384px', objectFit: 'contain', margin: '0 auto', transform: 'scale(1.2)' }}
               />
             </div>
             <button
               onClick={() => navigate(-1)}
-              className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors mt-16"
+              style={{ display: 'inline-flex', alignItems: 'center', padding: '12px 16px', backgroundColor: '#2563eb', color: '#ffffff', borderRadius: '8px', transition: 'background-color 0.2s', marginTop: '32px', gap: '8px' }}
+              onMouseOver={(e) => e.currentTarget.style.backgroundColor = '#1d4ed8'}
+              onMouseOut={(e) => e.currentTarget.style.backgroundColor = '#2563eb'}
             >
-              <ArrowLeft className="w-5 h-5 mr-2" />
-              Go Back
+              <ArrowLeft style={{ width: '20px', height: '20px' }} />
+              Return to society
             </button>
           </div>
         </div>
