@@ -1,6 +1,12 @@
 // src/context/AppContext.js
 import React, { createContext, useState, useEffect } from 'react';
-import { supabase } from '../supabase-client';
+import { createClient } from '@supabase/supabase-js';
+
+// Initialize Supabase client
+export const supabase = createClient(
+  process.env.REACT_APP_SUPABASE_URL,
+  process.env.REACT_APP_SUPABASE_ANON_KEY
+);
 
 export const AppContext = createContext();
 
