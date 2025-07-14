@@ -1,8 +1,7 @@
-import React, { useContext, useState, useEffect } from 'react';
+import { useContext, useState, useEffect } from 'react';
 import { Clock, Check, X } from 'lucide-react';
 import { AppContext } from '../context/appcontext';
 import Layout from './layout';
-import DatePicker from 'react-datepicker';
 import "react-datepicker/dist/react-datepicker.css";
 
 const Availability = () => {

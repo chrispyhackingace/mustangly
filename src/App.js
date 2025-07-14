@@ -7,7 +7,6 @@ import Bookings from './components/bookings';
 import Settings from './components/settings';
 import Confirmation from './components/confirmation';
 import ErrorPage from './components/errorpage';
-import Layout from './components/layout';
 import OAuthCallback from './components/oauthcallback';
 import GoogleAuthHandler from './components/googleauthhandler';
 import ProtectedRoute from './components/ProtectedRoute';

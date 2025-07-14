@@ -2,7 +2,7 @@
 import React, { useContext, useState, useEffect } from 'react';
 import { User, Calendar as CalendarIcon, Clock, Mail, Trash2, Shield, X } from 'lucide-react';
 import { AppContext } from '../context/appcontext';
-import { supabase } from '../context/appcontext'; // Ensure Supabase client is imported
+import { supabase } from '../supabase-client'; // Ensure Supabase client is imported
 import Layout from './layout'; // ✅ Import Layout
 
 const Bookings = () => {
